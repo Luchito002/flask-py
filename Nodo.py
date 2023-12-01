@@ -111,29 +111,29 @@ def get_siguiente_movimiento(tablero):
     movimiento_inmediato_perdedor = False
     
     if camino_ganador:
-        movimiento_inmediato_ganador = movimiento_inmediato(camino_ganador[-1], tablero_inicial, WinnerStatus.WIN)
+        movimiento_inmediato_ganador = movimiento_inmediato(camino_ganador[-1], tablero, WinnerStatus.WIN)
     if camino_empate:
-        movimiento_inmediato_empate = movimiento_inmediato(camino_empate[-1], tablero_inicial, WinnerStatus.DRAW)
+        movimiento_inmediato_empate = movimiento_inmediato(camino_empate[-1], tablero, WinnerStatus.DRAW)
     if camino_perdedor:
-        movimiento_inmediato_perdedor = movimiento_inmediato(camino_perdedor[-1], tablero_inicial, WinnerStatus.LOST, "O")
+        movimiento_inmediato_perdedor = movimiento_inmediato(camino_perdedor[-1], tablero, WinnerStatus.LOST, "O")
     
     if(camino_ganador is not None and movimiento_inmediato_ganador):
-        posicion = camino_ganador[-1]
+        return camino_ganador[-1]
     
     if(camino_empate is not None and movimiento_inmediato_empate):
-        posicion = camino_empate[-1]
+        return = camino_empate[-1]
     
     if(camino_perdedor is not None and movimiento_inmediato_perdedor):
-        posicion = camino_perdedor[-1]
+        return = camino_perdedor[-1]
     
     # No hay jugadas inmediatas
     if camino_ganador:
-        posicion = camino_ganador[-1]
+        return camino_ganador[-1]
     
     if camino_empate:
-        posicion = camino_empate[-1]
+        return camino_empate[-1]
     
     if camino_perdedor:
-        posicion = camino_perdedor[-1]
+        return camino_perdedor[-1]
 
     return posicion
