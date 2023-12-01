@@ -78,7 +78,6 @@ def siguiente_movimiento_computadora(nodo, tablero):
     tablero_actual = tablero.copy()
 
     ganadores = encontrar_resultados(nodo, WinnerStatus.WIN)
-    print(ganadores[0].name)
     if ganadores:
         for ganador in ganadores:
             tablero = tablero_actual.copy()
@@ -88,7 +87,6 @@ def siguiente_movimiento_computadora(nodo, tablero):
                 return ganador.name
 
     perdedores = encontrar_resultados(nodo, WinnerStatus.LOST)
-    print(perdedores[0].name)
     if perdedores:
         for perdedor in perdedores:
             tablero = tablero_actual.copy()
@@ -98,7 +96,6 @@ def siguiente_movimiento_computadora(nodo, tablero):
                 return perdedor.name
 
     empates = encontrar_resultados(nodo, WinnerStatus.DRAW)
-    print(empates[0].name)
     if empates:
         for empate in empates:
             tablero = tablero_actual.copy()
