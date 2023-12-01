@@ -62,25 +62,53 @@ class Nodo:
                 if nuevo_estado == WinnerStatus.NONE:
                     nuevo_nodo.generar_arbol(nuevo_tablero, 'O' if jugador_actual == 'X' else 'X')
 
+def encontrar_resultados(nodo, status):
+    resultados = []
+
+    if nodo.winner_status == status:
+        resultados.append(nodo)
+
+    for hijo in nodo.nodos:
+        resultados.extend(encontrar_resultados(hijo, status))
+
+    return resultados
+
+
 def siguiente_movimiento_computadora(nodo, tablero):
-    if nodo.isCheck or nodo.winner_status is not None:
-        return None
+    tablero_actual = tablero.copy()
 
-    for hijo in nodo.nodos:
-        if hijo.winner_status == WinnerStatus.WIN:
-            return hijo.name  
+    ganadores = encontrar_resultados(nodo, WinnerStatus.WIN)
+    print(ganadores[0].name)
+    if ganadores:
+        for ganador in ganadores:
+            tablero = tablero_actual.copy()
+            tablero[ganador.name] = 'X'
+            if verificar_ganador(tablero) == WinnerStatus.WIN:
+                print("Movimiento de ganadores")
+                return ganador.name
 
-    for hijo in nodo.nodos:
-        if hijo.winner_status == WinnerStatus.LOST:
-            continue 
+    perdedores = encontrar_resultados(nodo, WinnerStatus.LOST)
+    print(perdedores[0].name)
+    if perdedores:
+        for perdedor in perdedores:
+            tablero = tablero_actual.copy()
+            tablero[perdedor.name] = 'O'
+            if verificar_ganador(tablero) == WinnerStatus.LOST:
+                print(f"Movimiento de perdedores X con {perdedor.name}")
+                return perdedor.name
 
-        nuevo_tablero = tablero.copy()
-        nuevo_tablero[hijo.name] = 'O'  
+    empates = encontrar_resultados(nodo, WinnerStatus.DRAW)
+    print(empates[0].name)
+    if empates:
+        for empate in empates:
+            tablero = tablero_actual.copy()
+            tablero[empate.name] = 'X'
+            if verificar_ganador(tablero) == WinnerStatus.DRAW:
+                print("Movimiento de empates")
+                return empate.name
 
-        siguiente_posicion = siguiente_movimiento_computadora(hijo, nuevo_tablero)
-
-        if siguiente_posicion is not None:
-            return siguiente_posicion 
+    if ganadores:
+        return ganadores[0].name
 
     for i in range(9):
         if tablero[i] is None:
@@ -97,5 +125,4 @@ def get_siguiente_movimiento(tablero):
     raiz.generar_arbol(tablero, 'X')
 
     posicion = siguiente_movimiento_computadora(raiz, tablero)
-    #print_tree(raiz_1)  # Puedes elegir imprimir el árbol que prefieras
     return posicion
