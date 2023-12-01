@@ -121,10 +121,10 @@ def get_siguiente_movimiento(tablero):
         return camino_ganador[-1]
     
     if(camino_empate is not None and movimiento_inmediato_empate):
-        return = camino_empate[-1]
+        return camino_empate[-1]
     
     if(camino_perdedor is not None and movimiento_inmediato_perdedor):
-        return = camino_perdedor[-1]
+        return camino_perdedor[-1]
     
     # No hay jugadas inmediatas
     if camino_ganador:
