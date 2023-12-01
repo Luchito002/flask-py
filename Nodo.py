@@ -62,34 +62,54 @@ class Nodo:
                 if nuevo_estado == WinnerStatus.NONE:
                     nuevo_nodo.generar_arbol(nuevo_tablero, 'O' if jugador_actual == 'X' else 'X')
 
-def encontrar_movimiento_mas_cercano(nodo, status, message, camino_actual=None):
-    if camino_actual is None:
-        camino_actual = []
+def encontrar_resultados(nodo, status):
+    resultados = []
 
-    if nodo.isCheck:
-        if nodo.winner_status == status:
-            return camino_actual + [nodo.name]
-        else:
-            return None
+    if nodo.winner_status == status:
+        resultados.append(nodo)
 
-    caminos = []
     for hijo in nodo.nodos:
-        camino_hijo = encontrar_movimiento_mas_cercano(hijo, status, message, camino_actual + [nodo.name])
-        if camino_hijo is not None:
-            caminos.append(camino_hijo)
+        resultados.extend(encontrar_resultados(hijo, status))
 
-    if len(caminos) == 0:
-        return None
+    return resultados
 
-    # Devolver el camino más corto
-    return min(caminos, key=len)
 
-def movimiento_inmediato(posicion, tablero, status, jugador = "X"):
-    tablero[posicion] = jugador
-    if verificar_ganador(tablero) == status:
-        return True
-    return False
+def siguiente_movimiento_computadora(nodo, tablero):
+    tablero_actual = tablero.copy()
 
+    ganadores = encontrar_resultados(nodo, WinnerStatus.WIN)
+    if ganadores:
+        for ganador in ganadores:
+            tablero = tablero_actual.copy()
+            tablero[ganador.name] = 'X'
+            if verificar_ganador(tablero) == WinnerStatus.WIN:
+                print("Movimiento de ganadores")
+                return ganador.name
+
+    perdedores = encontrar_resultados(nodo, WinnerStatus.LOST)
+    if perdedores:
+        for perdedor in perdedores:
+            tablero = tablero_actual.copy()
+            tablero[perdedor.name] = 'O'
+            if verificar_ganador(tablero) == WinnerStatus.LOST:
+                print(f"Movimiento de perdedores X con {perdedor.name}")
+                return perdedor.name
+
+    empates = encontrar_resultados(nodo, WinnerStatus.DRAW)
+    if empates:
+        for empate in empates:
+            tablero = tablero_actual.copy()
+            tablero[empate.name] = 'X'
+            if verificar_ganador(tablero) == WinnerStatus.DRAW:
+                print("Movimiento de empates")
+                return empate.name
+
+    if ganadores:
+        return ganadores[0].name
+
+    for i in range(9):
+        if tablero[i] is None:
+            return i
 
 
 print(f"Número de veces ganadas: {ganadas}")
@@ -101,39 +121,5 @@ def get_siguiente_movimiento(tablero):
     raiz = Nodo(name="inicio", isCheck=False, winner_status=None, nodos=[])
     raiz.generar_arbol(tablero, 'X')
 
-    posicion = 0
-    camino_ganador = encontrar_movimiento_mas_cercano(raiz, WinnerStatus.WIN, 'Con ganadores')
-    camino_empate = encontrar_movimiento_mas_cercano(raiz, WinnerStatus.DRAW, 'Con empates')
-    camino_perdedor = encontrar_movimiento_mas_cercano(raiz, WinnerStatus.LOST, 'Con perdedores')
-    
-    movimiento_inmediato_ganador = False
-    movimiento_inmediato_empate = False
-    movimiento_inmediato_perdedor = False
-    
-    if camino_ganador:
-        movimiento_inmediato_ganador = movimiento_inmediato(camino_ganador[-1], tablero, WinnerStatus.WIN)
-    if camino_empate:
-        movimiento_inmediato_empate = movimiento_inmediato(camino_empate[-1], tablero, WinnerStatus.DRAW)
-    if camino_perdedor:
-        movimiento_inmediato_perdedor = movimiento_inmediato(camino_perdedor[-1], tablero, WinnerStatus.LOST, "O")
-    
-    if(camino_ganador is not None and movimiento_inmediato_ganador):
-        return camino_ganador[-1]
-    
-    if(camino_empate is not None and movimiento_inmediato_empate):
-        return camino_empate[-1]
-    
-    if(camino_perdedor is not None and movimiento_inmediato_perdedor):
-        return camino_perdedor[-1]
-    
-    # No hay jugadas inmediatas
-    if camino_ganador:
-        return camino_ganador[-1]
-    
-    if camino_empate:
-        return camino_empate[-1]
-    
-    if camino_perdedor:
-        return camino_perdedor[-1]
-
+    posicion = siguiente_movimiento_computadora(raiz, tablero)
     return posicion
